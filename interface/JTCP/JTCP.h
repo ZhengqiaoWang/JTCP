@@ -1,4 +1,6 @@
-#include <sys/epoll.h>
-#include <sys/socket.h>
-#include <arpa/inet.h>
+#ifndef _JTCP_H_
+#define _JTCP_H_
 
+#include "JTCP/server/server.h"
+
+#endif
