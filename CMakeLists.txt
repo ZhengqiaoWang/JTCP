@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.11)
 
 set(PACKAGE_NAME JTCP)
 set(PACKAGE_VERSION 1.0.0)
@@ -10,7 +10,19 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-find_package(JResult REQUIRED PATHS ${CMAKE_SOURCE_DIR}/third_party/JResult)
+
+include_directories(${CMAKE_SOURCE_DIR}/include)
+file(GLOB_RECURSE ALL_SRCS 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/server/*.cpp
+)
+message(STATUS "ALL_SRCS: ${ALL_SRCS}")
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/third_party/JResult)
+add_library(${PROJECT_NAME} STATIC ${ALL_SRCS})
+target_link_libraries(${PROJECT_NAME} JResult)
+
+# 导出头文件路径
+target_include_directories(JTCP PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 # Enable code coverage
 option(ENABLE_COVERAGE "Use GCOV" OFF)
