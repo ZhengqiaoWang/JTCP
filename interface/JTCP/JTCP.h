@@ -1,6 +1,6 @@
-#ifndef _JTCP_H_
-#define _JTCP_H_
+#pragma once
 
 #include "JTCP/server/server.h"
+#include "JTCP/client/client.h"
 
-#endif
+#pragma once

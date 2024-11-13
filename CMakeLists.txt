@@ -21,5 +21,5 @@ endif()
 
 if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     enable_testing()
-    add_subdirectory(test)
+    add_subdirectory(ut)
 endif()
