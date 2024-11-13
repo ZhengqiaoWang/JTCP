@@ -1,0 +1,14 @@
+
+set(JTCP_ROOT_DIR ${CMAKE_CURRENT_LIST_DIR})
+string(REGEX REPLACE "\\\\" "/" JTCP_ROOT_DIR "${JTCP_ROOT_DIR}/..")
+set(JTCP_INCLUDE_DIR "${JTCP_ROOT_DIR}/interface")
+
+message(STATUS "JTCP_ROOT_DIR: ${JTCP_ROOT_DIR}")
+message(STATUS "JTCP_INCLUDE_DIR: ${JTCP_INCLUDE_DIR}")
+
+find_path(
+    JTCP_INCLUDE_DIR
+    NO_DEFAULT_PATH
+)
+
+include_directories(JTCP ${JTCP_INCLUDE_DIR})
