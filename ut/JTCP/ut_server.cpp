@@ -16,33 +16,31 @@ TEST_CASE("server")
         client_num++;
         std::cout << "client connect: " << client->getPeerIP() << ":" << client->getPeerPort()
                   << std::endl;
-        client->setOnClientExitCB([&client_num](Server::TCPPeerClient* ptr) {
-            std::cout << "client disconnect fd: " << ptr->getFileDescribe()->getFD() << std::endl;
-            client_num--;
-        });
-        client->setOnRecvDataCB(
-            [&client_num](Server::TCPPeerClient* ptr, const char* data, size_t len) {
-                if (len == 0) {
+
+        client->setOnRecvDataCB([](Server::TCPPeerClient* ptr) {
+            while (1) {
+                std::size_t buff_size = 2048;
+                char        buff[buff_size]{0};
+                auto        ret = ptr->readData(buff, buff_size);
+                if (ret.isFailure()) {
+                    std::cout << std::endl << "client disconnect" << std::endl;
                     return;
                 }
 
-                auto recv_num = atoi(data);
+                std::cout << "recv data(" << *(ret.getSuccessPtr()) << "): " << buff;
 
-                std::string ret_num = std::to_string(recv_num + 1);
-
-                if (auto ret = ptr->sendData(ret_num.c_str(), ret_num.size()); ret.isFailure()) {
-                    std::cout << "send data failed: " << *(ret.getFailurePtr()) << std::endl;
-                }
-
-                std::cout << "client send to server: " << ret_num << std::endl;
-            });
+                std::string html{"<!DOCTYPE html><html> <head><title>test</title></head><body> "
+                                 "<h1> TEST </h1> </body> </html>"};
+                ptr->sendData(html.c_str(), html.size());
+            }
+        });
     });
 
     server.start("0.0.0.0", 9998);
 
     for (int i = 0; i < 5; ++i) {
         if (auto ret = Client::TCPClient::createNew("127.0.0.1", 9998); ret.isFailure()) {
-            std::cout << "create client failed" << std::endl;
+            std::cout << "create client failed: " << *(ret.getFailurePtr()) << std::endl;
         }
         else {
             auto client = ret.getSuccessPtr()->get();
