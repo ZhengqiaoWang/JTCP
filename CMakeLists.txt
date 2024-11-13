@@ -14,6 +14,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 file(GLOB_RECURSE ALL_SRCS 
     ${CMAKE_CURRENT_SOURCE_DIR}/src/server/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/client/*.cpp
 )
 message(STATUS "ALL_SRCS: ${ALL_SRCS}")
 
