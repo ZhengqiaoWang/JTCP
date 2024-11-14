@@ -6,6 +6,7 @@
 #include <functional>
 #include <future>
 #include <unordered_map>
+#include <mutex>
 
 namespace JTCP::Server {
 
@@ -80,7 +81,8 @@ private:
     std::future<JResultWithErrMsg> m_accept_thread;               ///< 监听连接的线程
 
     using ClientMgrType = std::unordered_map<FileDescribe::FDType, TCPPeerClientPtr>;
-    ClientMgrType m_client_mgr;   ///< 客户端管理
+    ClientMgrType m_client_mgr;         ///< 客户端管理
+    std::mutex    m_client_mgr_mutex;   ///< 客户端管理锁
 
     using EpollFileDescribeType = FileDescribe::FDType;
     EpollFileDescribeType m_epollfd;   ///< epoll文件描述符

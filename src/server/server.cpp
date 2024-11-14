@@ -97,7 +97,10 @@ JResultWithErrMsg TCPServer::acceptThreadFunc(const ListenMaxNumType& listen_max
 
     // 服务停止，释放各个资源
     m_run_flag = false;
-    m_client_mgr.clear();
+    {
+        std::lock_guard<std::mutex> lock_guard(m_client_mgr_mutex);
+        m_client_mgr.clear();
+    }
     return JResultWithErrMsg::success();
 }
 
@@ -151,7 +154,10 @@ JResultWithErrMsg TCPServer::handleNewClientConnect()
         return ret;
     }
 
-    m_client_mgr[conn->getFD()] = peer_client;
+    {
+        std::lock_guard<std::mutex> lock_guard(m_client_mgr_mutex);
+        m_client_mgr[conn->getFD()] = peer_client;
+    }
     m_on_new_client_cb(peer_client);
 
     return JResultWithErrMsg::success();
@@ -159,7 +165,11 @@ JResultWithErrMsg TCPServer::handleNewClientConnect()
 
 JResultWithErrMsg TCPServer::handleClientMsg(epoll_event& event)
 {
-    auto peer_client = m_client_mgr.at(event.data.fd);
+    TCPPeerClientPtr peer_client{nullptr};
+    {
+        std::lock_guard<std::mutex> lock_guard(m_client_mgr_mutex);
+        peer_client = m_client_mgr.at(event.data.fd);
+    }
     if (nullptr == peer_client) {
         return JResultWithErrMsg::failure("peer client is nullptr");
     }
@@ -175,7 +185,10 @@ JResultWithErrMsg TCPServer::delClient(const FileDescribe::FDType& fd)
     if (auto ret = epollOprEvent(EPOLL_CTL_DEL, fd, 0); ret.isFailure()) {
         return ret;
     }
-    m_client_mgr.erase(fd);
+    {
+        std::lock_guard<std::mutex> lock_guard(m_client_mgr_mutex);
+        m_client_mgr.erase(fd);
+    }
     printf("delete client: %d\n", fd);
 
     return JResultWithErrMsg::success();
