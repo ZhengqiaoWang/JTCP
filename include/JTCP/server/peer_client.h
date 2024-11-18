@@ -21,7 +21,8 @@ public:
         : m_server(server)
     {}
 
-    using OnRecvDataCBType = std::function<void(TCPPeerClient*)>;
+    using OnRecvDataCBType   = std::function<void(TCPPeerClient*)>;
+    using OnDisconnectCBType = std::function<void(TCPPeerClient*)>;
 
 public:
     struct sockaddr_in* getSockAddr();
@@ -36,6 +37,9 @@ public:
     void setOnRecvDataCB(OnRecvDataCBType cb);
     void onRecvData();
 
+    void setOnDisconnectCB(OnDisconnectCBType cb);
+    void onDisconnect();
+
     JResultWithSuccErrMsg<std::size_t> sendData(const char* data, size_t len);
     JResultWithSuccErrMsg<std::size_t> readData(char* data, const size_t& expect_len);
 
@@ -44,6 +48,7 @@ private:
     FileDescribePtr    m_fd{nullptr};
     struct sockaddr_in m_sock_addr;
     OnRecvDataCBType   m_on_recv_data_cb{[](TCPPeerClient*) {}};
+    OnDisconnectCBType m_on_disconnect_cb{[](TCPPeerClient*) {}};
 };
 
 using TCPPeerClientPtr = std::shared_ptr<TCPPeerClient>;

@@ -34,6 +34,11 @@ TEST_CASE("server")
                 ptr->sendData(html.c_str(), html.size());
             }
         });
+
+        client->setOnDisconnectCB([](Server::TCPPeerClient* ptr) {
+            std::cout << "client disconnect: " << ptr->getPeerIP() << ":" << ptr->getPeerPort()
+                      << std::endl;
+        });
     });
 
     server.start("0.0.0.0", 9998);

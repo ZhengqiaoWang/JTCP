@@ -185,10 +185,21 @@ JResultWithErrMsg TCPServer::delClient(const FileDescribe::FDType& fd)
     if (auto ret = epollOprEvent(EPOLL_CTL_DEL, fd, 0); ret.isFailure()) {
         return ret;
     }
+    TCPPeerClientPtr client{nullptr};
     {
         std::lock_guard<std::mutex> lock_guard(m_client_mgr_mutex);
+        auto                        client_iter = m_client_mgr.find(fd);
+        if (client_iter != m_client_mgr.end()) {
+            client = client_iter->second;
+        }
         m_client_mgr.erase(fd);
     }
+
+    if (nullptr == client) {
+        return JResultWithErrMsg::failure("peer client is nullptr");
+    }
+
+    client->onDisconnect();
     printf("delete client: %d\n", fd);
 
     return JResultWithErrMsg::success();

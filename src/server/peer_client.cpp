@@ -34,6 +34,15 @@ void TCPPeerClient::onRecvData()
     m_on_recv_data_cb(this);
 }
 
+void TCPPeerClient::setOnDisconnectCB(OnDisconnectCBType cb)
+{
+    m_on_disconnect_cb = cb;
+}
+void TCPPeerClient::onDisconnect()
+{
+    m_on_disconnect_cb(this);
+}
+
 JResultWithSuccErrMsg<std::size_t> TCPPeerClient::sendData(const char* data, size_t len)
 {
     auto sended_length = send(m_fd->getFD(), data, len, 0);
