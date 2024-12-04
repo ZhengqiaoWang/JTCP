@@ -25,6 +25,14 @@ else()
 endif()
 message(STATUS "Git Commit: ${GIT_COMMIT}")
 
+# 获取当前系统时间
+execute_process(
+    COMMAND date +%Y%m%d_%H%M%S
+    OUTPUT_VARIABLE BUILD_TIME
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+message(STATUS "Build Time: ${BUILD_TIME}")
+
 # 添加源文件
 include_directories(${CMAKE_SOURCE_DIR}/include)
 file(GLOB_RECURSE ALL_SRCS 
@@ -38,14 +46,16 @@ add_library(${PROJECT_NAME} STATIC ${ALL_SRCS})
 target_link_libraries(${PROJECT_NAME} JResult)
 
 # 设置生成的库文件名
-set(LIBRARY_OUTPUT_NAME ${PROJECT_NAME}_${PACKAGE_VERSION}_${GIT_COMMIT})
+set(LIBRARY_OUTPUT_NAME ${PROJECT_NAME}_${PACKAGE_VERSION}_${BUILD_TIME}_${GIT_COMMIT})
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${LIBRARY_OUTPUT_NAME})
+message(STATUS "LIBRARY_OUTPUT_NAME: ${LIBRARY_OUTPUT_NAME}")
 
 # 创建软链接
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E create_symlink
     $<TARGET_FILE:${PROJECT_NAME}> ${CMAKE_BINARY_DIR}/lib${PROJECT_NAME}.a
 )
+message(STATUS "Create symlink lib${PROJECT_NAME}.a")
 
 # 导出头文件路径
 target_include_directories(JTCP PUBLIC ${PROJECT_SOURCE_DIR}/include)
