@@ -13,8 +13,16 @@
 #include <unordered_map>
 #include <mutex>
 
+/**
+ * @brief Server命名空间
+ * 
+ */
 namespace JTCP::Server {
 
+/**
+ * @brief TCP对手方客户端对象类，见include/JTCP/server/peer_client.h文件
+ * 
+ */
 class TCPPeerClient;
 using TCPPeerClientPtr = std::shared_ptr<TCPPeerClient>;
 
@@ -25,6 +33,10 @@ using TCPPeerClientPtr = std::shared_ptr<TCPPeerClient>;
 class TCPServer
 {
 public:
+    /**
+     * @brief 新客户端连接回调类型
+     * 
+     */
     using OnNewClientCBType = std::function<void(TCPPeerClientPtr)>;
     /**
      * @brief 设置当有客户端链接时触发的回调
@@ -44,6 +56,11 @@ public:
      */
     JResultWithErrMsg start(const Types::IPStrType& listen_addr, const Types::PortType& listen_port,
                             const ListenMaxNumType& listen_max_num = 20);
+    /**
+     * @brief 停止监听
+     *
+     * @return JResultWithErrMsg 返回值
+     */
     JResultWithErrMsg stop();
 
 private:
@@ -55,6 +72,11 @@ private:
      */
     JResultWithErrMsg acceptThreadFunc(const ListenMaxNumType& listen_max_num);
 
+    /**
+     * @brief 初始化epoll
+     *
+     * @return JResultWithErrMsg 返回值
+     */
     JResultWithErrMsg initEpoll();
 
     using EpollEventType = uint32_t;

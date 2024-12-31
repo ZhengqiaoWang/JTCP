@@ -1,37 +1,14 @@
 cmake_minimum_required(VERSION 3.11)
 
-set(PACKAGE_NAME JTCP)
-set(PACKAGE_VERSION 1.0.0)
-
-project(${PACKAGE_NAME})
-message(STATUS "Building ${PACKAGE_NAME} ${PACKAGE_VERSION}")
+project(JTCP)
 
 # 设置编译选项
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-# 获取当前的 Git commit ID
-find_package(Git QUIET)
-if(GIT_FOUND AND EXISTS "${CMAKE_SOURCE_DIR}/.git")
-    execute_process(
-        COMMAND ${GIT_EXECUTABLE} rev-parse --short HEAD
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        OUTPUT_VARIABLE GIT_COMMIT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-else()
-    set(GIT_COMMIT "unknown")
-endif()
-message(STATUS "Git Commit: ${GIT_COMMIT}")
-
-# 获取当前系统时间
-execute_process(
-    COMMAND date +%Y%m%d_%H%M%S
-    OUTPUT_VARIABLE BUILD_TIME
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-message(STATUS "Build Time: ${BUILD_TIME}")
+include(cmake/BuildTemplate.cmake)
+message(STATUS "Building ${CMAKE_PROJECT_NAME} ${PROJECT_VERSION}")
 
 # 添加源文件
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -46,7 +23,7 @@ add_library(${PROJECT_NAME} STATIC ${ALL_SRCS})
 target_link_libraries(${PROJECT_NAME} JResult)
 
 # 设置生成的库文件名
-set(LIBRARY_OUTPUT_NAME ${PROJECT_NAME}_${PACKAGE_VERSION}_${BUILD_TIME}_${GIT_COMMIT})
+set(LIBRARY_OUTPUT_NAME ${PROJECT_NAME}_${PROJECT_VERSION}_${BUILD_TIME}_${GIT_COMMIT})
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME ${LIBRARY_OUTPUT_NAME})
 message(STATUS "LIBRARY_OUTPUT_NAME: ${LIBRARY_OUTPUT_NAME}")
 
@@ -73,3 +50,5 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
 
     add_subdirectory(example)
 endif()
+
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
